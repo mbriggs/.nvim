@@ -1,13 +1,26 @@
 " vim: set foldmethod=marker foldlevel=0:
-" ============================================================================
+
 " mbriggs neovim configs
-"
+" ======================
+
 " plugins {{{
 call plug#begin('~/.nvim/plugged')
 
 Plug 'chriskempson/base16-vim'
 Plug 'kien/ctrlp.vim'
+" {{{
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]\.(git|hg|svn|node_modules|tmp|bundle)$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ }
+" }}}
 Plug 'SirVer/ultisnips'
+" {{{
+let g:UltiSnipsExpandTrigger="<nop>"
+let g:UltiSnipsEditSplit="vertical"
+" }}}
 Plug 'Shougo/deoplete.nvim'
 Plug 'junegunn/vim-emoji'
 Plug 'junegunn/vim-oblique' | Plug 'junegunn/vim-pseudocl'
@@ -17,69 +30,174 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-commentary',        { 'on': '<Plug>Commentary' }
+Plug 'tpope/vim-commentary', { 'on': '<Plug>Commentary' }
 Plug 'tpope/vim-eunuch'
 Plug 't9md/vim-surround_custom_mapping'
+" {{{
+let g:surround_custom_mapping = {}
+let g:surround_custom_mapping.ruby = {
+            \ '-':  "<% \r %>",
+            \ '=':  "<%= \r %>",
+            \ '%':  "%|\r|",
+            \ 'w':  "%w(\r)",
+            \ '#':  "#{\r}",
+            \ }
+let g:surround_custom_mapping.javascript = {
+            \ 'f':  "function(){ \r }"
+            \ }
+" }}}
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'vim-scripts/nginx.vim'
+Plug 'othree/html5.vim'
 Plug 'othree/yajs.vim'
+Plug 'othree/javascript-libraries-syntax.vim'
+" {{{
+  let g:used_javascript_libs = 'jquery'
+" }}}
 Plug 'mxw/vim-jsx'
+Plug 'ap/vim-css-color'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'zerowidth/vim-copy-as-rtf', { 'on': 'CopyRTF' }
+Plug 'ngmy/vim-rubocop'
 Plug 'justinmk/vim-gtfo'
-Plug 'tpope/vim-fugitive'
 Plug 'gregsexton/gitv', { 'on': 'Gitv' }
 Plug 'mhinz/vim-signify'
+" {{{
+let g:signify_sign_add                 = "\u258F"
+let g:signify_sign_delete              = "\u2581"
+let g:signify_sign_delete_first_line   = "\u2594"
+let g:signify_sign_change              = g:signify_sign_add
+let g:signify_sign_changedelete        = g:signify_sign_add
+let g:signify_vcs_list                 = ['git']
+let g:signify_cursorhold_normal        = 1
+
+set background=dark
+
+augroup sign-column
+  autocmd!
+  autocmd BufEnter * call s:force_sign_col()
+  function! s:force_sign_col()
+    sign define dummy
+    execute 'sign place 9999 line=1 name=dummy buffer=' . bufnr('')
+  endfunction
+augroup END
+" }}}
 Plug 'vim-ruby/vim-ruby'
 Plug 'plasticboy/vim-markdown'
 Plug 'honza/dockerfile.vim'
 Plug 'chrisbra/unicode.vim', { 'for': 'journal' }
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim'
+" {{{
+let g:gist_clip_command = 'pbcopy'
+let g:gist_detect_filetype = 1
+" }}}
 Plug 'sodapopcan/vim-twiggy'
+Plug 'scrooloose/nerdtree'
+" {{{
+map <f1> <esc>:NERDTreeToggle<CR>
+" }}}
+Plug 'scrooloose/syntastic'
+" {{{
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+" }}}
+Plug 'rhysd/clever-f.vim'
+" {{{
+let g:clever_f_across_no_line = 1
+" }}}
+Plug 'Raimondi/delimitMate'
+" {{{
+let delimitMate_expand_cr = 2
+let delimitMate_expand_space = 1 " {|} => { | }
+" }}}
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-indent'
+Plug 'nelstrom/vim-textobj-rubyblock'
+Plug 'Valloric/MatchTagAlways'
+Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-liquid'
+Plug 'esneider/YUNOcommit.vim'
+Plug 'tpope/vim-fugitive'
+" {{{
+  " Fix broken syntax highlight in gitcommit files
+  " (https://github.com/tpope/vim-git/issues/12)
+  let g:fugitive_git_executable = 'LANG=en_US.UTF-8 git'
+
+  nnoremap <silent> <leader>gs :Gstatus<CR>
+  nnoremap <silent> <leader>gd :Gdiff<CR>
+  nnoremap <silent> <leader>gc :Gcommit<CR>
+  nnoremap <silent> <leader>gb :Gblame<CR>
+  nnoremap <silent> <leader>ge :Gedit<CR>
+  nnoremap <silent> <leader>gE :Gedit<space>
+  nnoremap <silent> <leader>gr :Gread<CR>
+  nnoremap <silent> <leader>gR :Gread<space>
+  nnoremap <silent> <leader>gw :Gwrite<CR>
+  nnoremap <silent> <leader>gW :Gwrite!<CR>
+  nnoremap <silent> <leader>gq :Gwq<CR>
+  nnoremap <silent> <leader>gQ :Gwq!<CR>
+
+  function! ReviewLastCommit()
+    if exists('b:git_dir')
+      Gtabedit HEAD^{}
+      nnoremap <buffer> <silent> q :<C-U>bdelete<CR>
+    else
+      echo 'No git a git repository:' expand('%:p')
+    endif
+  endfunction
+  nnoremap <silent> <leader>g` :call ReviewLastCommit()<CR>
+
+  augroup fugitiveSettings
+    autocmd!
+    autocmd FileType gitcommit setlocal nolist
+    autocmd BufReadPost fugitive://* setlocal bufhidden=delete
+  augroup END
+" }}}
+Plug 'tpope/vim-dispatch'
+Plug 'junegunn/vim-peekaboo'
+" {{{
+  let g:peekaboo_delay = 400
+" }}}
+Plug 'janko-m/vim-test'
+" {{{
+  function! TerminalSplitStrategy(cmd) abort
+    tabnew | call termopen(a:cmd) | startinsert
+  endfunction
+  let g:test#custom_strategies = get(g:, 'test#custom_strategies', {})
+  let g:test#custom_strategies.terminal_split = function('TerminalSplitStrategy')
+  let test#strategy = 'terminal_split'
+
+  nnoremap <silent> <leader>rr :TestFile<CR>
+  nnoremap <silent> <leader>rf :TestNearest<CR>
+  nnoremap <silent> <leader>rs :TestSuite<CR>
+  nnoremap <silent> <leader>ra :TestLast<CR>
+  nnoremap <silent> <leader>ro :TestVisit<CR>
+" }}}
+Plug 'ludovicchabant/vim-gutentags'
+" {{{
+  let g:gutentags_exclude = [
+      \ '*.min.js',
+      \ '*html*',
+      \ 'jquery*.js',
+      \ '*/vendor/*',
+      \ '*/node_modules/*',
+      \ '*/migrate/*.rb'
+      \ ]
+  let g:gutentags_generate_on_missing = 0
+  let g:gutentags_generate_on_write = 0
+  let g:gutentags_generate_on_new = 0
+  nnoremap <leader>gt :GutentagsUpdate!<CR>
+" }}}
 
 call plug#end()
-" }}}
-" settings {{{
-colorscheme base16-eighties
-set background=dark
-
-set showcmd                               " show commands in the lower right hand corner
-set backupdir=~/.nvim/backup               " save backups to .vim/backup
-set directory=~/.nvim/backup               " save .swp files to .vim/backup
-set undodir=~/.nvim/backup                 " persistant undo
-set undofile                              " save undo info
-set undolevels=1000                       " for a long time
-set undoreload=10000                      " ..
-filetype plugin indent on                 " load the plugin and indent settings for the detected filetype
-set backspace=indent,eol,start            " allow backspacing over everything in insert mode
-set laststatus=2                          " always have status bar
-set wildmode=list:longest,list:full       " bash-like tab completion
-set ignorecase                            " ignore case when searching
-set smartcase                             " disable ignorecase when there are caps
-set nowrap                                " turn off line wrapping
-set tabstop=2                             " tabs are 2 spaces
-set shiftwidth=2                          " >> goes 2 spaces
-set softtabstop=2                         " auto tabs are 2 spaces
-set autoread                              " load file if it changed on disk
-set expandtab                             " spaces instead of tabs
-set list listchars=tab:\ \ ,trail:.       " show leading and trailings spaces/tabs
-set encoding=utf-8                        " default encoding to utf-8
-set ruler                                 " cursor position in modeline
-syntax on                                 " syntax highlighting
-set novisualbell                          " turn off blinking
-set history=1000                          " lots of history
-set linebreak                             " wrap at word
-set showtabline=2                         " always show tabs
-set wrap                                  " word wrap
-set showbreak=...                         " show ... at line break
-set confirm                               " confirm save when leaving unsaved buffers
-set foldlevelstart=99                     " turn off default folding
-set wildignore+=.git,.hg,node_modules,tmp " dont search these places
-set clipboard=unnamed                     " use system clipboard
-set background=dark                       " use dark bg
-set timeoutlen=1000 ttimeoutlen=0         " fix esc delay
-set shell=zsh\ -l
 " }}}
 " ag {{{
 if executable('ag')
@@ -90,22 +208,22 @@ endif
 " text objects {{{
 autocmd VimEnter * call after_object#enable('=', ':', '-', '#', ' ')
 " }}}
-" snippets {{{
-let g:UltiSnipsEditSplit="vertical"
-" }}}
 " mappings {{{
 let mapleader=' '
-let maplocalleader='  '
+let maplocalleader=' ;'
 
 nmap <Leader>so <esc>:source ~/.nvim/vimrc.vim
 nmap <Leader>p <esc>:CtrlP
 
-" tab indents
-vnoremap <tab> ==
+map <c-j> <esc><c-w><c-w>
+map <Leader><Leader> <c-^>
 
 " kill line
 inoremap <c-s-bs> <esc>ddi
 noremap <c-s-bs> <esc>ddi
+
+" kill word
+inoremap <c-bs> <esc>dbi
 
 " ret open new line below
 inoremap <c-cr> <esc>o
@@ -186,8 +304,15 @@ autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
 let g:deoplete#enable_at_startup = 1
-imap <expr> <TAB> UltiSnips#ExpandSnippetOrJump() ? "" :  pumvisible() ? "\<C-n>" : "\<TAB>"
-imap <expr> ; pumvisible() ? deoplete#mappings#smart_close_popup() : ";"
+imap <expr> ; CloseCompletionOrSemi()
+
+func! CloseCompletionOrSemi()
+  if pumvisible()
+    deoplete#mappings#smart_close_popup()
+  else
+    return ";"
+  endif
+endfunc
 " }}}
 " auto mkdir {{{
 augroup vimrc-auto-mkdir
@@ -210,59 +335,21 @@ function! s:copy_path()
   let @+=expand('%')
 endfunction
 " }}}
-" gist {{{
-let g:gist_clip_command = 'pbcopy'
-let g:gist_detect_filetype = 1
-" }}}
-" navigation {{{
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-" }}}
-" syntastic {{{
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+" tab {{{
+vnoremap <tab> ==
+nnoremap <tab> ==
+imap <expr> <TAB>  HandleITab()
+func! HandleITab()
+  if UltiSnips#ExpandSnippetOrJump()
+    return ""
+  endif
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
-let g:syntastic_html_checkers = ['']
-let g:syntastic_javascript_checkers = ['']
-" }}}
-" surround {{{
-let g:surround_custom_mapping = {}
-let g:surround_custom_mapping.ruby = {
-            \ '-':  "<% \r %>",
-            \ '=':  "<%= \r %>",
-            \ '%':  "%|\r|",
-            \ 'w':  "%w(\r)",
-            \ '#':  "#{\r}",
-            \ }
-let g:surround_custom_mapping.javascript = {
-            \ 'f':  "function(){ \r }"
-            \ }
-" }}}
-" git changes {{{
-let g:signify_sign_add                 = "|"
-let g:signify_sign_delete              = "|"
-let g:signify_sign_delete_first_line   = "|"
-let g:signify_sign_change              = g:signify_sign_add
-let g:signify_sign_changedelete        = g:signify_sign_add
-let g:signify_vcs_list                 = ['git']
-let g:signify_cursorhold_normal        = 1
-
-set background=dark
-
-augroup sign-column
-  autocmd!
-  autocmd BufEnter * call s:force_sign_col()
-  function! s:force_sign_col()
-    sign define dummy
-    execute 'sign place 9999 line=1 name=dummy buffer=' . bufnr('')
-  endfunction
-augroup END
+  if pumvisible()
+    return "\<C-n>"
+  else
+    return "\<ESC>==i"
+  endif
+endfunc
 " }}}
 " modeline {{{
 set statusline=%f       "tail of the filename
@@ -317,5 +404,46 @@ function! FileSize()
 
   return bytes
 endfunction
+" }}}
+" settings {{{
+colorscheme base16-eighties
+set background=dark
+
+set showcmd                               " show commands in the lower right hand corner
+set backupdir=~/.nvim/backup               " save backups to .vim/backup
+set directory=~/.nvim/backup               " save .swp files to .vim/backup
+set undodir=~/.nvim/backup                 " persistant undo
+set undofile                              " save undo info
+set undolevels=1000                       " for a long time
+set undoreload=10000                      " ..
+filetype plugin indent on                 " load the plugin and indent settings for the detected filetype
+set backspace=indent,eol,start            " allow backspacing over everything in insert mode
+set laststatus=2                          " always have status bar
+set wildmode=list:longest,list:full       " bash-like tab completion
+set ignorecase                            " ignore case when searching
+set smartcase                             " disable ignorecase when there are caps
+set nowrap                                " turn off line wrapping
+set tabstop=2                             " tabs are 2 spaces
+set shiftwidth=2                          " >> goes 2 spaces
+set softtabstop=2                         " auto tabs are 2 spaces
+set autoread                              " load file if it changed on disk
+set expandtab                             " spaces instead of tabs
+set list listchars=tab:\ \ ,trail:.       " show leading and trailings spaces/tabs
+set ruler                                 " cursor position in modeline
+syntax on                                 " syntax highlighting
+set novisualbell                          " turn off blinking
+set history=1000                          " lots of history
+set linebreak                             " wrap at word
+set showtabline=2                         " always show tabs
+set wrap                                  " word wrap
+set showbreak=...                         " show ... at line break
+set confirm                               " confirm save when leaving unsaved buffers
+set foldlevelstart=99                     " turn off default folding
+set wildignore+=.git,.hg,node_modules,tmp " dont search these places
+set clipboard=unnamed                     " use system clipboard
+set background=dark                       " use dark bg
+set timeoutlen=1000 ttimeoutlen=0         " fix esc delay
+
+set guifont=Input\ Regular:h14
 " }}}
 
