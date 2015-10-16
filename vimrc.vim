@@ -1,12 +1,122 @@
 " vim: set foldmethod=marker foldlevel=0:
 
-" mbriggs neovim configs
+" mbriggs neovim config
 " ======================
 
+" ag {{{
+if executable('ag')
+  set grepprg=ag\ --nogroup\ --nocolor
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+endif
+" }}}
+" text objects {{{
+autocmd VimEnter * call after_object#enable('=', ':', '-', '#', ' ')
+" }}}
+" mappings {{{
+let mapleader=' '
+let maplocalleader=','
+
+nmap <Leader>so <esc>:source ~/.nvim/vimrc.vim
+nmap <Leader>p <esc>:CtrlP<cr>
+
+" jump splits
+map <c-j> <esc><c-w><c-w>
+
+" toggle last file
+map <Leader><Leader> <c-^>
+
+" make toggle fold easier to hit
+nmap zz za
+
+" join in insert mode
+inoremap <c-j> <esc>Ji
+
+" save
+map <c-s> :w<cr>
+
+" alt-tab
+nmap <Leader><tab> <c-^>
+
+" close all other splits
+nmap - :only<cr>
+
+" jump to matching pair
+nnoremap <Leader>m %
+
+nmap <right> :lnext<cr>
+nmap <left> :lprevious<cr>
+nmap <down> :cnext<cr>
+nmap <up> :cprevious<cr>
+
+" %% for current dir
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
+
+" front and back of a line
+nnoremap <s-h> ^
+nnoremap <s-l> $
+
+" up and down move the screen
+nnoremap <c-s-j> <c-e>
+nnoremap <c-s-k> <c-y>
+
+"toggle spellcheck
+nmap <f4> :set spell!<cr>
+
+" why isn't it this by default??
+nnoremap <s-y> y$
+
+"resize window
+nnoremap <silent> + :exe "resize " . (winheight(0) * 3/2)<CR>
+nnoremap <silent> _ :exe "resize " . (winheight(0) * 2/3)<CR>
+
+" term stuff
+tnoremap <esc> <C-\><C-n>
+tnoremap <c-j> <C-\><C-n><C-w><C-w>
+
+" }}}
+" omnifuncs {{{
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+" }}}
 " plugins {{{
 call plug#begin('~/.nvim/plugged')
 
+Plug 'jszakmeister/vim-togglecursor'
+Plug 'Shougo/deoplete.nvim'
+" {{{
+let g:deoplete#enable_at_startup = 1
+
+imap <expr> ; CloseCompletionOrSemi()
+func! CloseCompletionOrSemi()
+  if pumvisible()
+    deoplete#mappings#smart_close_popup()
+  else
+    return ";"
+  endif
+endfunc
+
+" }}}
+Plug 'alvan/vim-closetag'
+Plug 'janko-m/vim-test'
+Plug 'Shougo/vimfiler.vim' | Plug 'Shougo/unite.vim'
+" {{{
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_safe_mode_by_default = 0
+
+" E edits from the local dir
+nmap <silent> E :VimFiler <C-R>=expand("%:p:h") . "/"<CR><CR>
+autocmd BufReadPost vimfiler set bufhidden=delete
+" }}}
+Plug 'ryanoasis/vim-devicons'
+" {{{
+
+" }}}
 Plug 'chriskempson/base16-vim'
+Plug 'mhartington/oceanic-next'
 Plug 'kien/ctrlp.vim'
 " {{{
 let g:ctrlp_map = '<c-p>'
@@ -16,18 +126,21 @@ let g:ctrlp_custom_ignore = {
   \ 'file': '\v\.(exe|so|dll)$',
   \ }
 " }}}
-Plug 'SirVer/ultisnips'
+Plug 'Shougo/neosnippet.vim'
 " {{{
-let g:UltiSnipsExpandTrigger="<nop>"
-let g:UltiSnipsEditSplit="vertical"
+let g:neosnippet#snippets_directory = $HOME.'/.nvim/snips'
+let g:neosnippet#disable_runtime_snippets = {
+      \   '_' : 1,
+      \ }
+
 " }}}
-Plug 'Shougo/deoplete.nvim'
 Plug 'junegunn/vim-emoji'
 Plug 'junegunn/vim-oblique' | Plug 'junegunn/vim-pseudocl'
 Plug 'junegunn/vim-after-object'
 Plug 'junegunn/vim-journal'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-rails'
+Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-commentary', { 'on': '<Plug>Commentary' }
@@ -49,12 +162,12 @@ let g:surround_custom_mapping.javascript = {
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'vim-scripts/nginx.vim'
 Plug 'othree/html5.vim'
-Plug 'othree/yajs.vim'
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
 Plug 'othree/javascript-libraries-syntax.vim'
 " {{{
   let g:used_javascript_libs = 'jquery'
 " }}}
-Plug 'mxw/vim-jsx'
 Plug 'ap/vim-css-color'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'zerowidth/vim-copy-as-rtf', { 'on': 'CopyRTF' }
@@ -199,120 +312,47 @@ Plug 'ludovicchabant/vim-gutentags'
 
 call plug#end()
 " }}}
-" ag {{{
-if executable('ag')
-  set grepprg=ag\ --nogroup\ --nocolor
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-endif
-" }}}
-" text objects {{{
-autocmd VimEnter * call after_object#enable('=', ':', '-', '#', ' ')
-" }}}
-" mappings {{{
-let mapleader=' '
-let maplocalleader=' ;'
+" settings {{{
+" colorscheme base16-eighties
+colorscheme OceanicNext
+set background=dark
 
-nmap <Leader>so <esc>:source ~/.nvim/vimrc.vim
-nmap <Leader>p <esc>:CtrlP
+set showcmd                               " show commands in the lower right hand corner
+set backupdir=~/.nvim/backup               " save backups to .vim/backup
+set directory=~/.nvim/backup               " save .swp files to .vim/backup
+set undodir=~/.nvim/backup                 " persistant undo
+set undofile                              " save undo info
+set undolevels=1000                       " for a long time
+set undoreload=10000                      " ..
+filetype plugin indent on                 " load the plugin and indent settings for the detected filetype
+set backspace=indent,eol,start            " allow backspacing over everything in insert mode
+set laststatus=2                          " always have status bar
+set wildmode=list:longest,list:full       " bash-like tab completion
+set ignorecase                            " ignore case when searching
+set smartcase                             " disable ignorecase when there are caps
+set nowrap                                " turn off line wrapping
+set tabstop=2                             " tabs are 2 spaces
+set shiftwidth=2                          " >> goes 2 spaces
+set softtabstop=2                         " auto tabs are 2 spaces
+set autoread                              " load file if it changed on disk
+set expandtab                             " spaces instead of tabs
+set list listchars=tab:\ \ ,trail:.       " show leading and trailings spaces/tabs
+set ruler                                 " cursor position in modeline
+syntax on                                 " syntax highlighting
+set novisualbell                          " turn off blinking
+set history=1000                          " lots of history
+set linebreak                             " wrap at word
+set showtabline=2                         " always show tabs
+set wrap                                  " word wrap
+set showbreak=...                         " show ... at line break
+set confirm                               " confirm save when leaving unsaved buffers
+set foldlevelstart=99                     " turn off default folding
+set wildignore+=.git,.hg,node_modules,tmp " dont search these places
+set clipboard=unnamed                     " use system clipboard
+set background=dark                       " use dark bg
+set timeoutlen=1000 ttimeoutlen=0         " fix esc delay
 
-map <c-j> <esc><c-w><c-w>
-map <Leader><Leader> <c-^>
-
-" kill line
-inoremap <c-s-bs> <esc>ddi
-noremap <c-s-bs> <esc>ddi
-
-" kill word
-inoremap <c-bs> <esc>dbi
-
-" ret open new line below
-inoremap <c-cr> <esc>o
-noremap <c-cr> <esc>o
-
-" ctrl-ret open new line above
-inoremap <c-s-cr> <esc>O
-noremap <c-s-cr> <esc>O
-
-" join in insert mode
-inoremap <c-s-j> <esc>Ji
-
-" duplicate line
-nnoremap <c-d> mpyyp`p
-
-" save
-map <c-s> :w<cr>
-
-" duplicate selection
-vnoremap <c-d> mpy`>p`p
-
-"new line, but stay in command mode
-nnoremap <c-return> mpo<esc>`p
-
-"new line, but stay at current position
-inoremap <c-return> <esc><c-return>a
-
-" alt-tab
-nmap <Leader><tab> <c-^>
-
-" close all other splits
-nmap - :only<cr>
-
-" CTags
-nmap <C-F5> :!ctags --extra=+f -R *<CR><CR>
-nmap <C-\> :tnext<CR>
-
-" jump to matching pair
-nnoremap <Leader> %
-
-nmap <right> :lnext<cr>
-nmap <left> :lprevious<cr>
-nmap <down> :cnext<cr>
-nmap <up> :cprevious<cr>
-
-"c-backspace to delete word
-imap <C-BS> <C-W>
-cmap <C-BS> <C-W>
-
-" Hit return to clear a search
-nnoremap <silent> <expr> <CR> &bt == "" ? ":nohlsearch<CR>" : "\<CR>"
-
-" %% for current dir
-cnoremap %% <C-R>=expand('%:h').'/'<cr>
-
-" front and back of a line
-nnoremap <s-h> ^
-nnoremap <s-l> $
-
-"toggle spellcheck
-nmap <f4> :set spell!<cr>
-
-" why isn't it this by default??
-nnoremap <s-y> y$
-
-"resize window
-nnoremap <silent> + :exe "resize " . (winheight(0) * 3/2)<CR>
-nnoremap <silent> _ :exe "resize " . (winheight(0) * 2/3)<CR>
-
-"\  goes back a jump
-nnoremap \ ,
-" }}}
-" completion {{{
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-let g:deoplete#enable_at_startup = 1
-imap <expr> ; CloseCompletionOrSemi()
-
-func! CloseCompletionOrSemi()
-  if pumvisible()
-    deoplete#mappings#smart_close_popup()
-  else
-    return ";"
-  endif
-endfunc
+set guifont=Knack\ Plus\ Nerd\ File\ Types:h18
 " }}}
 " auto mkdir {{{
 augroup vimrc-auto-mkdir
@@ -340,8 +380,8 @@ vnoremap <tab> ==
 nnoremap <tab> ==
 imap <expr> <TAB>  HandleITab()
 func! HandleITab()
-  if UltiSnips#ExpandSnippetOrJump()
-    return ""
+  if neosnippet#expandable_or_jumpable()
+    return "\<Plug>(neosnippet_expand_or_jump)"
   endif
 
   if pumvisible()
@@ -350,6 +390,25 @@ func! HandleITab()
     return "\<ESC>==i"
   endif
 endfunc
+" }}}
+" duping stuff {{{
+func! s:DupeLine()
+  normal! mpyyp`p
+  call repeat#set("\<Plug>DupeLine")
+endfunc
+
+func! s:DupeVis()
+  normal! mpy`>p`p
+  call repeat#set("\<Plug>DupeVis")
+endfunc
+
+nmap <Plug>DupeLine :call <SID>DupeLine()<cr>
+vmap <Plug>DupeVis :call <SID>DupeVis()<cr>
+nmap <c-d> <Plug>DupeLine
+vmap <c-d> <Plug>DupeVis
+" }}}
+" cr {{{
+nnoremap <silent> <expr> <CR> &bt == "" ? ":nohlsearch<CR>" : "\<CR>"
 " }}}
 " modeline {{{
 set statusline=%f       "tail of the filename
@@ -405,45 +464,3 @@ function! FileSize()
   return bytes
 endfunction
 " }}}
-" settings {{{
-colorscheme base16-eighties
-set background=dark
-
-set showcmd                               " show commands in the lower right hand corner
-set backupdir=~/.nvim/backup               " save backups to .vim/backup
-set directory=~/.nvim/backup               " save .swp files to .vim/backup
-set undodir=~/.nvim/backup                 " persistant undo
-set undofile                              " save undo info
-set undolevels=1000                       " for a long time
-set undoreload=10000                      " ..
-filetype plugin indent on                 " load the plugin and indent settings for the detected filetype
-set backspace=indent,eol,start            " allow backspacing over everything in insert mode
-set laststatus=2                          " always have status bar
-set wildmode=list:longest,list:full       " bash-like tab completion
-set ignorecase                            " ignore case when searching
-set smartcase                             " disable ignorecase when there are caps
-set nowrap                                " turn off line wrapping
-set tabstop=2                             " tabs are 2 spaces
-set shiftwidth=2                          " >> goes 2 spaces
-set softtabstop=2                         " auto tabs are 2 spaces
-set autoread                              " load file if it changed on disk
-set expandtab                             " spaces instead of tabs
-set list listchars=tab:\ \ ,trail:.       " show leading and trailings spaces/tabs
-set ruler                                 " cursor position in modeline
-syntax on                                 " syntax highlighting
-set novisualbell                          " turn off blinking
-set history=1000                          " lots of history
-set linebreak                             " wrap at word
-set showtabline=2                         " always show tabs
-set wrap                                  " word wrap
-set showbreak=...                         " show ... at line break
-set confirm                               " confirm save when leaving unsaved buffers
-set foldlevelstart=99                     " turn off default folding
-set wildignore+=.git,.hg,node_modules,tmp " dont search these places
-set clipboard=unnamed                     " use system clipboard
-set background=dark                       " use dark bg
-set timeoutlen=1000 ttimeoutlen=0         " fix esc delay
-
-set guifont=Input\ Regular:h14
-" }}}
-
