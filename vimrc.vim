@@ -22,6 +22,12 @@ nmap <Leader>p <esc>:CtrlP<cr>
 " jump splits
 map <c-j> <esc><c-w><c-w>
 
+" One keystroke--instead of 4--to save
+nnoremap <CR> :write<CR>
+
+" who needs loads of macro registers?
+nnoremap Q @q
+
 " toggle last file
 map <Leader><Leader> <c-^>
 
@@ -43,6 +49,10 @@ nmap - :only<cr>
 " jump to matching pair
 nnoremap <Leader>m %
 
+" move by method
+nnoremap <Leader>n ]m
+nnoremap <Leader>p [m
+
 nmap <right> :lnext<cr>
 nmap <left> :lprevious<cr>
 nmap <down> :cnext<cr>
@@ -56,8 +66,8 @@ nnoremap <s-h> ^
 nnoremap <s-l> $
 
 " up and down move the screen
-nnoremap <c-s-j> <c-e>
-nnoremap <c-s-k> <c-y>
+nmap <c-n> <c-e>
+nmap <c-p> <c-y>
 
 "toggle spellcheck
 nmap <f4> :set spell!<cr>
@@ -85,6 +95,16 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " plugins {{{
 call plug#begin('~/.nvim/plugged')
 
+Plug 'airblade/vim-rooter'
+" {{{
+let g:rooter_disable_map = 1
+" }}}
+Plug 'dsummersl/vim-cdo'
+Plug 'rking/ag.vim'
+" {{{
+let g:ag_working_path_mode="r"
+" }}}
+Plug 'mvolkmann/vim-js-arrow-function'
 Plug 'jszakmeister/vim-togglecursor'
 Plug 'Shougo/deoplete.nvim'
 " {{{
@@ -119,7 +139,8 @@ Plug 'chriskempson/base16-vim'
 Plug 'mhartington/oceanic-next'
 Plug 'kien/ctrlp.vim'
 " {{{
-let g:ctrlp_map = '<c-p>'
+nmap B :CtrlPBuffer<cr>
+let g:ctrlp_map = '\'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\v[\/]\.(git|hg|svn|node_modules|tmp|bundle)$',
@@ -234,7 +255,7 @@ let delimitMate_expand_space = 1 " {|} => { | }
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'kana/vim-textobj-user'
 Plug 'kana/vim-textobj-indent'
-Plug 'nelstrom/vim-textobj-rubyblock'
+Plug 'rhysd/vim-textobj-ruby'
 Plug 'Valloric/MatchTagAlways'
 Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-liquid'
