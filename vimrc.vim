@@ -103,6 +103,11 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " plugins {{{
 call plug#begin('~/.nvim/plugged')
 
+Plug 'milkypostman/vim-togglelist'
+" {{{
+nmap <script> <silent> <leader>l :call ToggleLocationList()<CR>
+nmap <script> <silent> <leader>q :call ToggleQuickfixList()<CR>
+" }}}
 Plug 'bkad/CamelCaseMotion'
 Plug 'airblade/vim-rooter'
 " {{{
@@ -262,9 +267,9 @@ let g:gist_detect_filetype = 1
 Plug 'sodapopcan/vim-twiggy'
 Plug 'benekastah/neomake'
 " {{{
-autocmd! BufWritePost,BufRead * Neomake
+autocmd! BufWritePre,BufRead,BufNewFile * Neomake
 
-let g:neomake_open_list = 1
+let g:neomake_open_list = 0
 let g:neomake_verbose = 0
 let g:neomake_error_sign = {
         \ 'texthl': 'ErrorMsg',
@@ -412,6 +417,9 @@ augroup vimrc-auto-mkdir
     endif
   endfunction
 augroup END
+" }}}
+" q quits {{{
+autocmd! FileType help,qf nmap <buffer> q <esc>:q<cr>
 " }}}
 " copy path {{{
 nnoremap <f8> :<C-u>call <SID>copy_path()<CR>
