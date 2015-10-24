@@ -267,13 +267,9 @@ let g:gist_detect_filetype = 1
 Plug 'sodapopcan/vim-twiggy'
 Plug 'benekastah/neomake'
 " {{{
-autocmd! BufWritePre,BufRead,BufNewFile * Neomake
 
 let g:neomake_open_list = 0
 let g:neomake_verbose = 0
-let g:neomake_error_sign = {
-        \ 'texthl': 'ErrorMsg',
-        \ }
 " }}}
 Plug 'rhysd/clever-f.vim'
 " {{{
@@ -534,3 +530,6 @@ autocmd BufRead,BufNewFile css.erb set filetype=eruby.css
 autocmd BufRead,BufNewFile scss.erb set filetype=eruby.scss
 autocmd BufRead,BufNewFile scpt.erb set filetype=eruby.applescript
 " }}}
+
+" needs to be at the bottom for some reason
+autocmd BufWrite,BufReadPost * Neomake
