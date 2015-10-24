@@ -16,8 +16,13 @@ autocmd VimEnter * call after_object#enable('=', ':', '-', '#', ' ')
 let mapleader=' '
 let maplocalleader=','
 
+nnoremap <silent> <expr> <CR> &bt == "" ? ":nohlsearch<CR>" : "\<CR>"
+
 nmap <Leader>so <esc>:source ~/.nvim/vimrc.vim
-nmap <Leader>p <esc>:CtrlP<cr>
+
+" dupe stuff
+vmap <c-d> mby`bp`bgv
+nmap <c-d> mpyyp`p
 
 " jump splits
 map <c-j> <esc><c-w><c-w>
@@ -83,6 +88,9 @@ nnoremap <silent> _ :exe "resize " . (winheight(0) * 2/3)<CR>
 tnoremap <esc> <C-\><C-n>
 tnoremap <c-j> <C-\><C-n><C-w><C-w>
 
+" enter in normal
+nnoremap <c-l> mbo<c-u><esc>`b<c-l>
+
 " }}}
 " omnifuncs {{{
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -138,15 +146,39 @@ Plug 'ryanoasis/vim-devicons'
 " }}}
 Plug 'chriskempson/base16-vim'
 Plug 'mhartington/oceanic-next'
-Plug 'kien/ctrlp.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf' }
+Plug 'junegunn/fzf.vim'
 " {{{
-nmap B :CtrlPBuffer<cr>
-let g:ctrlp_map = '\'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn|node_modules|tmp|bundle)$',
-  \ 'file': '\v\.(exe|so|dll)$',
-  \ }
+  let g:fzf_nvim_statusline = 0 " disable statusline overwriting
+
+  nnoremap <silent> \ :Files<CR>
+  nnoremap <silent> B :Buffers<CR>
+  nnoremap <silent> <leader>; :BLines<CR>
+  nnoremap <silent> <leader>o :BTags<CR>
+  nnoremap <silent> <leader>: :Commands<CR>
+  nnoremap <silent> <leader>? :History<CR>
+  nnoremap <silent> <leader>/ :execute 'Ag ' . input('Ag/')<CR>
+  nnoremap <silent> K :call SearchWordWithAg()<CR>
+  vnoremap <silent> K :call SearchVisualSelectionWithAg()<CR>
+
+  imap <C-x><C-f> <plug>(fzf-complete-file-ag)
+  imap <C-x><C-l> <plug>(fzf-complete-line)
+
+  function! SearchWordWithAg()
+    execute 'Ag' expand('<cword>')
+  endfunction
+
+  function! SearchVisualSelectionWithAg() range
+    let old_reg = getreg('"')
+    let old_regtype = getregtype('"')
+    let old_clipboard = &clipboard
+    set clipboard&
+    normal! ""gvy
+    let selection = getreg('"')
+    call setreg('"', old_reg, old_regtype)
+    let &clipboard = old_clipboard
+    execute 'Ag' selection
+  endfunction
 " }}}
 Plug 'Shougo/neosnippet.vim'
 " {{{
@@ -228,17 +260,15 @@ let g:gist_clip_command = 'pbcopy'
 let g:gist_detect_filetype = 1
 " }}}
 Plug 'sodapopcan/vim-twiggy'
-Plug 'scrooloose/syntastic'
+Plug 'benekastah/neomake'
 " {{{
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+autocmd! BufWritePost,BufRead * Neomake
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
+let g:neomake_open_list = 1
+let g:neomake_verbose = 0
+let g:neomake_error_sign = {
+        \ 'texthl': 'ErrorMsg',
+        \ }
 " }}}
 Plug 'rhysd/clever-f.vim'
 " {{{
@@ -365,7 +395,6 @@ set showbreak=...                         " show ... at line break
 set confirm                               " confirm save when leaving unsaved buffers
 set foldlevelstart=99                     " turn off default folding
 set wildignore+=.git,.hg,node_modules,tmp " dont search these places
-set clipboard=unnamed                     " use system clipboard
 set background=dark                       " use dark bg
 set timeoutlen=1000 ttimeoutlen=0         " fix esc delay
 
@@ -434,24 +463,7 @@ func! HandleNTab()
   endif
 endfunc
 " }}}
-" duping stuff {{{
-func! s:DupeLine()
-  normal! mpyyp`p
-  call repeat#set("\<Plug>DupeLine")
-endfunc
-
-func! s:DupeVis()
-  normal! mpy`>p`p
-  call repeat#set("\<Plug>DupeVis")
-endfunc
-
-nmap <Plug>DupeLine :call <SID>DupeLine()<cr>
-vmap <Plug>DupeVis :call <SID>DupeVis()<cr>
-nmap <c-d> <Plug>DupeLine
-vmap <c-d> <Plug>DupeVis
-" }}}
 " cr {{{
-nnoremap <silent> <expr> <CR> &bt == "" ? ":nohlsearch<CR>" : "\<CR>"
 " }}}
 " modeline {{{
 set statusline=%f       "tail of the filename
@@ -459,9 +471,8 @@ set statusline=%f       "tail of the filename
 set statusline+=%y      "filetype
 set statusline+=%r      "read only flag
 set statusline+=%m      "modified flag
-set statusline+=%{fugitive#statusline()}
-
 set statusline+=%{FileSize()}
+set statusline+=%{fugitive#statusline()}
 
 set statusline+=%#warningmsg#
 set statusline+=%*
