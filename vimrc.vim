@@ -95,6 +95,7 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " plugins {{{
 call plug#begin('~/.nvim/plugged')
 
+Plug 'bkad/CamelCaseMotion'
 Plug 'airblade/vim-rooter'
 " {{{
 let g:rooter_disable_map = 1
@@ -164,7 +165,7 @@ Plug 'tpope/vim-rails'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-commentary', { 'on': '<Plug>Commentary' }
+Plug 'tomtom/tcomment_vim'
 Plug 'tpope/vim-eunuch'
 Plug 't9md/vim-surround_custom_mapping'
 " {{{
@@ -227,10 +228,6 @@ let g:gist_clip_command = 'pbcopy'
 let g:gist_detect_filetype = 1
 " }}}
 Plug 'sodapopcan/vim-twiggy'
-Plug 'scrooloose/nerdtree'
-" {{{
-map <f1> <esc>:NERDTreeToggle<CR>
-" }}}
 Plug 'scrooloose/syntastic'
 " {{{
 set statusline+=%#warningmsg#
@@ -268,7 +265,6 @@ Plug 'tpope/vim-fugitive'
 
   nnoremap <silent> <leader>gs :Gstatus<CR>
   nnoremap <silent> <leader>gd :Gdiff<CR>
-  nnoremap <silent> <leader>gc :Gcommit<CR>
   nnoremap <silent> <leader>gb :Gblame<CR>
   nnoremap <silent> <leader>ge :Gedit<CR>
   nnoremap <silent> <leader>gE :Gedit<space>
@@ -397,18 +393,44 @@ function! s:copy_path()
 endfunction
 " }}}
 " tab {{{
-vnoremap <tab> ==
-nnoremap <tab> ==
-imap <expr> <TAB>  HandleITab()
+vmap <expr> <TAB> HandleVTab()
+nmap <expr> <TAB> HandleNTab()
+imap <expr> <TAB> HandleITab()
+
 func! HandleITab()
   if neosnippet#expandable_or_jumpable()
-    return "\<Plug>(neosnippet_expand_or_jump)"
+    return "\<Plug>(neosnippet_jump_or_expand)"
   endif
 
   if pumvisible()
     return "\<C-n>"
   else
     return "\<ESC>==i"
+  endif
+endfunc
+
+
+func! HandleVTab()
+  if neosnippet#expandable_or_jumpable()
+    return "\<Plug>(neosnippet_jump_or_expand)"
+  endif
+
+  if pumvisible()
+    return "\<C-n>"
+  else
+    return "\<esc>mbgv=`bgv"
+  endif
+endfunc
+
+func! HandleNTab()
+  if neosnippet#expandable_or_jumpable()
+    return "\<Plug>(neosnippet_jump_or_expand)"
+  endif
+
+  if pumvisible()
+    return "\<C-n>"
+  else
+    return "\mb==`b"
   endif
 endfunc
 " }}}
@@ -437,8 +459,9 @@ set statusline=%f       "tail of the filename
 set statusline+=%y      "filetype
 set statusline+=%r      "read only flag
 set statusline+=%m      "modified flag
+set statusline+=%{fugitive#statusline()}
 
-set statusline+=\ \ \ %{FileSize()}
+set statusline+=%{FileSize()}
 
 set statusline+=%#warningmsg#
 set statusline+=%*
@@ -471,17 +494,24 @@ function! FileSize()
   endif
 
   if bytes > gb
-    return printf('%.2f', bytes / gb) . "gb"
+    return printf('[%.2f', bytes / gb) . "gb]"
   endif
 
   if bytes > mb
-    return printf('%.2f', bytes / mb) . "mb"
+    return printf('[%.2f', bytes / mb) . "mb]"
   endif
 
   if bytes > kb
-    return printf('%.2f', bytes / kb) . "kb"
+    return printf('[%.2f', bytes / kb) . "kb]"
   endif
 
-  return bytes
+  return printf('[%.2f', bytes) . "b]"
 endfunction
+" }}}
+" file type mappings {{{
+autocmd BufRead,BufNewFile html.erb set filetype=eruby.html
+autocmd BufRead,BufNewFile js.erb set filetype=eruby.javascript
+autocmd BufRead,BufNewFile css.erb set filetype=eruby.css
+autocmd BufRead,BufNewFile scss.erb set filetype=eruby.scss
+autocmd BufRead,BufNewFile scpt.erb set filetype=eruby.applescript
 " }}}
