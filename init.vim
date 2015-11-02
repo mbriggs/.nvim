@@ -20,6 +20,8 @@ nnoremap <silent> <expr> <CR> &bt == "" ? ":nohlsearch<CR>" : "\<CR>"
 
 nmap <Leader>so <esc>:source ~/.nvim/vimrc.vim
 
+noremap <c-c> <esc>
+
 " dupe stuff
 vmap <c-d> mby`bp`bgv
 nmap <c-d> mpyyp`p
@@ -103,6 +105,9 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " plugins {{{
 call plug#begin('~/.nvim/plugged')
 
+Plug 'kassio/neoterm'
+Plug 'gavocanov/vim-js-indent'
+Plug 'moll/vim-node'
 Plug 'milkypostman/vim-togglelist'
 " {{{
 nmap <script> <silent> <leader>l :call ToggleLocationList()<CR>
@@ -127,7 +132,7 @@ let g:deoplete#enable_at_startup = 1
 imap <expr> ; CloseCompletionOrSemi()
 func! CloseCompletionOrSemi()
   if pumvisible()
-    deoplete#mappings#smart_close_popup()
+    return "\<c-y>"
   else
     return ";"
   endif
@@ -136,6 +141,15 @@ endfunc
 " }}}
 Plug 'alvan/vim-closetag'
 Plug 'janko-m/vim-test'
+" {{{
+nmap <leader>tt :TestNearest<CR>
+nmap <leader>tf :TestFile<CR>
+nmap <leader>ta :TestSuite<CR>
+nmap <leader>tl :TestLast<CR>
+nmap <leader>t; :TestVisit<CR>
+
+let test#strategy = "neoterm"
+" }}}
 Plug 'Shougo/vimfiler.vim' | Plug 'Shougo/unite.vim'
 " {{{
 let g:vimfiler_as_default_explorer = 1
@@ -444,10 +458,6 @@ endfunc
 
 
 func! HandleVTab()
-  if neosnippet#expandable_or_jumpable()
-    return "\<Plug>(neosnippet_jump_or_expand)"
-  endif
-
   if pumvisible()
     return "\<C-n>"
   else
@@ -456,18 +466,12 @@ func! HandleVTab()
 endfunc
 
 func! HandleNTab()
-  if neosnippet#expandable_or_jumpable()
-    return "\<Plug>(neosnippet_jump_or_expand)"
-  endif
-
   if pumvisible()
     return "\<C-n>"
   else
-    return "\mb==`b"
+    return "mb==`b"
   endif
 endfunc
-" }}}
-" cr {{{
 " }}}
 " modeline {{{
 set statusline=%f       "tail of the filename
@@ -477,6 +481,9 @@ set statusline+=%r      "read only flag
 set statusline+=%m      "modified flag
 set statusline+=%{FileSize()}
 set statusline+=%{fugitive#statusline()}
+set statusline+=%#NeotermTestRunning#%{neoterm#test#status('running')}%*
+set statusline+=%#NeotermTestSuccess#%{neoterm#test#status('success')}%*
+set statusline+=%#NeotermTestFailed#%{neoterm#test#status('failed')}%*
 
 set statusline+=%#warningmsg#
 set statusline+=%*
@@ -533,3 +540,4 @@ autocmd BufRead,BufNewFile scpt.erb set filetype=eruby.applescript
 
 " needs to be at the bottom for some reason
 autocmd BufWrite,BufReadPost * Neomake
+let test#strategy = "neoterm"

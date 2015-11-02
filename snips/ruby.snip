@@ -1,0 +1,18 @@
+snippet fg
+  FactoryGirl.define do
+    factory :${1:name} do
+      ${0}
+    end
+  end
+
+snippet fseq
+  sequence(:${1:name}) { |i| ${1:val} }${0}
+
+snippet fassf
+  association :${1:name}, factory: :${2:factory}
+
+snippet fass
+  association :${1:name}
+
+snippet fp
+  ${1:property} { ${2:val} }${0}
