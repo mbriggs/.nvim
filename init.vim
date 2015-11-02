@@ -380,9 +380,9 @@ colorscheme OceanicNext
 set background=dark
 
 set showcmd                               " show commands in the lower right hand corner
-set backupdir=~/.nvim/backup               " save backups to .vim/backup
-set directory=~/.nvim/backup               " save .swp files to .vim/backup
-set undodir=~/.nvim/backup                 " persistant undo
+set backupdir=~/.config/nvim/backup               " save backups to .vim/backup
+set directory=~/.config/nvim/backup               " save .swp files to .vim/backup
+set undodir=~/.config/nvim/backup                 " persistant undo
 set undofile                              " save undo info
 set undolevels=1000                       " for a long time
 set undoreload=10000                      " ..
