@@ -18,7 +18,9 @@ let maplocalleader=','
 
 nnoremap <silent> <expr> <CR> &bt == "" ? ":nohlsearch<CR>" : "\<CR>"
 
-nmap <Leader>so <esc>:source ~/.nvim/vimrc.vim
+nmap <Leader>so <esc>:source ~/.config/nvim/init.vim
+
+nmap <Leader>. <c-]>
 
 noremap <c-c> <esc>
 
