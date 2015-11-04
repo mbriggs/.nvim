@@ -3,3 +3,6 @@ backup/*
 /shada
 !backup/.gitkeep
 .netrwhist
+*-rplugin~
+tags.lock
+tags.temp

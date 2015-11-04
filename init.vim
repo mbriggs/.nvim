@@ -87,7 +87,7 @@ nnoremap <silent> + :exe "resize " . (winheight(0) * 3/2)<CR>
 nnoremap <silent> _ :exe "resize " . (winheight(0) * 2/3)<CR>
 
 " term stuff
-tnoremap <esc> <C-\><C-n>
+" tnoremap <esc> <C-\><C-n>
 tnoremap <c-j> <C-\><C-n><C-w><C-w>
 
 " enter in normal
@@ -139,7 +139,6 @@ func! CloseCompletionOrSemi()
 endfunc
 
 " }}}
-Plug 'alvan/vim-closetag'
 Plug 'janko-m/vim-test'
 " {{{
 nmap <leader>tt :TestNearest<CR>
@@ -172,16 +171,12 @@ Plug 'junegunn/fzf.vim'
 
   nnoremap <silent> \ :Files<CR>
   nnoremap <silent> B :Buffers<CR>
-  nnoremap <silent> <leader>; :BLines<CR>
   nnoremap <silent> <leader>o :BTags<CR>
   nnoremap <silent> <leader>: :Commands<CR>
   nnoremap <silent> <leader>? :History<CR>
   nnoremap <silent> <leader>/ :execute 'Ag ' . input('Ag/')<CR>
   nnoremap <silent> K :call SearchWordWithAg()<CR>
   vnoremap <silent> K :call SearchVisualSelectionWithAg()<CR>
-
-  imap <C-x><C-f> <plug>(fzf-complete-file-ag)
-  imap <C-x><C-l> <plug>(fzf-complete-line)
 
   function! SearchWordWithAg()
     execute 'Ag' expand('<cword>')
@@ -208,11 +203,12 @@ let g:neosnippet#disable_runtime_snippets = {
 
 " }}}
 Plug 'junegunn/vim-emoji'
+Plug 'vim-multiple-cursors'
 Plug 'junegunn/vim-oblique' | Plug 'junegunn/vim-pseudocl'
 Plug 'junegunn/vim-after-object'
 Plug 'junegunn/vim-journal'
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-rails'
+Plug 'tpope/vim-rails' | Plug 'vim-scripts/TailMinusF'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
@@ -293,12 +289,13 @@ Plug 'Raimondi/delimitMate'
 " {{{
 let delimitMate_expand_cr = 2
 let delimitMate_expand_space = 1 " {|} => { | }
+au FileType html,eruby,xml let b:delimitMate_matchpairs = "" "handle with closetag
+au FileType ruby let b:delimitMate_quotes = "\" ' |"
 " }}}
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'kana/vim-textobj-user'
 Plug 'kana/vim-textobj-indent'
 Plug 'rhysd/vim-textobj-ruby'
-Plug 'Valloric/MatchTagAlways'
 Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-liquid'
 Plug 'esneider/YUNOcommit.vim'
@@ -366,10 +363,14 @@ Plug 'ludovicchabant/vim-gutentags'
       \ '*/node_modules/*',
       \ '*/migrate/*.rb'
       \ ]
-  let g:gutentags_generate_on_missing = 0
-  let g:gutentags_generate_on_write = 0
-  let g:gutentags_generate_on_new = 0
+  let g:gutentags_generate_on_missing = 1
+  let g:gutentags_generate_on_write = 1
+  let g:gutentags_generate_on_new = 1
   nnoremap <leader>gt :GutentagsUpdate!<CR>
+" }}}
+Plug 'alvan/vim-closetag'
+" {{{
+let g:closetag_filenames = "*.html,*.erb,*.xml"
 " }}}
 
 call plug#end()
